@@ -5,10 +5,9 @@ export async function GET() {
 try {
 const client = await clientPromise;
 const db = client.db("TestCluster");
-const collections = await db.listCollections().toArray();
+const collections = await db.listCollections({ name: "accounts" }).toArray();
 return NextResponse.json({ collections });
 } catch (error) {
-return NextResponse.json({ error: "Database connection failed" }, { status
-: 500 });
+return NextResponse.json({ error: "Database connection failed" }, { status: 500 });
 }
 }
