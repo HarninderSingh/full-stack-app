@@ -15,10 +15,12 @@ export default function LoginPage() {
             email: form.email,
             password: form.password,
         });
+        console.log("Login result:", res);
         if (res?.error) {
             setError("Invalid email or password");
         } else {
             router.push("/dashboard"); // Redirect on success
+            router.refresh();
         }
     }
     return (
