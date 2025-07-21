@@ -60,34 +60,21 @@ const handler = NextAuth({
   },
 
   callbacks: {
-    async jwt({ token, user, account }) {
-      // If signing in (first login), attach id from DB (for both Google & Credentials)
+    async jwt({ token, user }) {
       if (user) {
-        const client = await clientPromise;
-        const db = client.db("test");
-
-        // Find the user by email regardless of provider
-        const existingUser = await db.collection("users").findOne({ email: user.email });
-
-        if (existingUser) {
-          token.id = existingUser._id.toString(); // unify sessions
-          token.email = existingUser.email;
-        } else {
-          // fallback in case user doesn't exist
-          token.id = user.id;
-          token.email = user.email;
-        }
+        token.id = user.id;
+        token.role = (user as any).role || "user"; // 🔐 attach role to JWT
       }
-
       return token;
     },
     async session({ session, token }) {
-      if (token) {
-        (session.user as { id: string }).id = token.id as string;
+      if (token?.role) {
+        (session.user as any).role = token.role; // 🔐 add role to session
       }
       return session;
     },
   },
+
 
   secret: process.env.NEXTAUTH_SECRET,
 });
