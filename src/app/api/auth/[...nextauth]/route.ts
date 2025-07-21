@@ -19,19 +19,12 @@ const handler = NextAuth({
         try {
           const client = await clientPromise;
           const db = client.db("test");
-          const user = await db.collection("users").findOne({
-            email: credentials.email
-          });
+          const user = await db.collection("users").findOne({ email: credentials.email });
 
-          if (!user) {
-            return null;
-          }
+          if (!user) return null;
 
           const isPasswordValid = await compare(credentials.password, user.password);
-
-          if (!isPasswordValid) {
-            return null;
-          }
+          if (!isPasswordValid) return null;
 
           return {
             id: user._id.toString(),
@@ -45,12 +38,21 @@ const handler = NextAuth({
       }
     })
   ],
+
+  // ✅ Add persistent login config here
   session: {
     strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60,    // 30 days
+    updateAge: 24 * 60 * 60       // Refresh every 24 hours
   },
+  jwt: {
+    maxAge: 30 * 24 * 60 * 60     // 30 days
+  },
+
   pages: {
     signIn: "/login",
   },
+
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
@@ -60,12 +62,13 @@ const handler = NextAuth({
     },
     async session({ session, token }) {
       if (token) {
-        session.user.id = token.id;
+        (session.user as { id: string }).id = token.id as string;
       }
       return session;
     },
   },
+
   secret: process.env.NEXTAUTH_SECRET,
 });
 
-export { handler as GET, handler as POST }; 
+export { handler as GET, handler as POST };

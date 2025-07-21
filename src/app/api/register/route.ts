@@ -19,4 +19,4 @@ export async function POST(req: Request) {
         createdAt: new Date(),
     });
     return NextResponse.json({ success: true, userId: result.insertedId });
-}
+} 
