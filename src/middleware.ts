@@ -6,20 +6,20 @@ export default withAuth({
         authorized: ({ token, req }) => {
             const isAdminPath = req.nextUrl.pathname.startsWith("/admin");
 
-            // Allow access only to admins for /admin paths
+            // Only allow users with admin role to access /admin routes
             if (isAdminPath) {
                 return token?.role === "admin";
             }
 
-            // Allow all authenticated users for other paths
+            // Allow all authenticated users to access other protected routes
             return !!token;
         },
     },
     pages: {
-        signIn: "/login",
+        signIn: "/login", // Redirect unauthenticated users to /login
     },
 });
 
 export const config = {
-    matcher: ["/dashboard/:path*", "/profile/:path*", "/admin/:path*"], // Protect /admin
+    matcher: ["/dashboard/:path*", "/profile/:path*", "/admin/:path*"], // Protect these routes
 };
