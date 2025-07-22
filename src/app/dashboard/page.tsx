@@ -14,6 +14,8 @@ export default function DashboardPage() {
     const { data: session, status } = useSession();
     const [users, setUsers] = useState<User[]>([]);
     const [error, setError] = useState("");
+    const [editRole, setEditRole] = useState<{ [id: string]: string }>({});
+    const [savingId, setSavingId] = useState<string | null>(null);
 
     useEffect(() => {
         if (session?.user?.role?.toLowerCase() === "admin") {
@@ -26,6 +28,28 @@ export default function DashboardPage() {
                 .catch(() => setError("Failed to load users"));
         }
     }, [session]);
+
+    const handleRoleChange = (id: string, newRole: string) => {
+        setEditRole((prev) => ({ ...prev, [id]: newRole }));
+    };
+
+    const handleSaveRole = async (id: string) => {
+        setSavingId(id);
+        const newRole = editRole[id];
+        try {
+            const res = await fetch(`/api/admin/users/${id}`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ role: newRole }),
+            });
+            if (!res.ok) throw new Error("Failed to update role");
+            setUsers((prev) => prev.map((u) => u._id === id ? { ...u, role: newRole } : u));
+        } catch {
+            alert("Failed to update role");
+        } finally {
+            setSavingId(null);
+        }
+    };
 
     if (status === "loading") {
         return <p className="p-6">Loading your dashboard...</p>;
@@ -60,6 +84,7 @@ export default function DashboardPage() {
                                 <th className="text-left px-2 py-1">Email</th>
                                 <th className="text-left px-2 py-1">Role</th>
                                 <th className="text-left px-2 py-1">Created At</th>
+                                <th className="text-left px-2 py-1">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -67,8 +92,27 @@ export default function DashboardPage() {
                                 <tr key={user._id} className="border-b">
                                     <td className="px-2 py-1">{user.name || <span className="text-gray-400 italic">(no name)</span>}</td>
                                     <td className="px-2 py-1">{user.email}</td>
-                                    <td className="px-2 py-1">{user.role || <span className="text-gray-400 italic">user</span>}</td>
+                                    <td className="px-2 py-1">
+                                        <select
+                                            className="border rounded px-2 py-1"
+                                            value={editRole[user._id] ?? user.role ?? "user"}
+                                            onChange={e => handleRoleChange(user._id, e.target.value)}
+                                            disabled={savingId === user._id}
+                                        >
+                                            <option value="user">user</option>
+                                            <option value="admin">admin</option>
+                                        </select>
+                                    </td>
                                     <td className="px-2 py-1">{user.createdAt ? new Date(user.createdAt).toLocaleString() : <span className="text-gray-400 italic">N/A</span>}</td>
+                                    <td className="px-2 py-1">
+                                        <button
+                                            className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs"
+                                            onClick={() => handleSaveRole(user._id)}
+                                            disabled={savingId === user._id || (editRole[user._id] ?? user.role) === user.role}
+                                        >
+                                            {savingId === user._id ? "Saving..." : "Save"}
+                                        </button>
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>
