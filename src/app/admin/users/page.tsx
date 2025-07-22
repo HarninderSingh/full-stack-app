@@ -1,5 +1,4 @@
 "use client";
-
 import { useEffect, useState } from "react";
 
 interface User {
@@ -7,6 +6,33 @@ interface User {
     email: string;
     name: string;
     role: string;
+}
+
+function RoleControl({ user }: { user: User }) {
+    const [updating, setUpdating] = useState(false);
+
+    const handleChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const newRole = e.target.value;
+        setUpdating(true);
+        await fetch("/api/admin/users/role", {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ userId: user._id, newRole }),
+        });
+        setUpdating(false);
+    };
+
+    return (
+        <select
+            value={user.role}
+            onChange={handleChange}
+            disabled={updating}
+            className="border px-2 py-1"
+        >
+            <option value="user">User</option>
+            <option value="admin">Admin</option>
+        </select>
+    );
 }
 
 export default function AdminUserPage() {
@@ -40,7 +66,9 @@ export default function AdminUserPage() {
                         <tr key={user._id} className="border-b">
                             <td className="py-2 px-3">{user.email}</td>
                             <td className="py-2 px-3">{user.name}</td>
-                            <td className="py-2 px-3 capitalize">{user.role}</td>
+                            <td className="py-2 px-3">
+                                <RoleControl user={user} />
+                            </td>
                         </tr>
                     ))}
                 </tbody>
