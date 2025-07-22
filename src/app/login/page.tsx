@@ -7,7 +7,6 @@ export default function LoginPage() {
     const [form, setForm] = useState({ email: "", password: "" });
     const [error, setError] = useState("");
     const router = useRouter();
-    const params = useSearchParams();
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
@@ -62,7 +61,7 @@ export default function LoginPage() {
                     </button>
                 </div>
                 <div className="mt-8 text-center">
-                    <p className="text-gray-600">Don't have an account?</p>
+                    <p className="text-gray-600">Don&apos;t have an account?</p>
                     <a href="/register" className="text-green-600 underline font-medium">Register here</a>
                 </div>
             </div>

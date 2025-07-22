@@ -6,15 +6,9 @@ declare module "next-auth" {
       id: string;
       email: string;
       name?: string;
-      role?: string; // Add role property
+      role?: string;
+      image?: string | null;
     };
-  }
-
-  interface User {
-    id: string;
-    email: string;
-    name?: string;
-    role?: string; // Add role property
   }
 }
 

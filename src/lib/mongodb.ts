@@ -1,6 +1,11 @@
 // lib/mongodb.ts
 import { MongoClient } from 'mongodb';
 
+declare global {
+  // allow global `var` usage in Node
+  var _mongoClientPromise: Promise<MongoClient> | undefined;
+}
+
 if (!process.env.MONGODB_URI) {
   throw new Error("Please define the MONGODB_URI environment variable");
 }
@@ -8,19 +13,9 @@ if (!process.env.MONGODB_URI) {
 const uri: string = process.env.MONGODB_URI;
 const options = {};
 
-let client: MongoClient;
-let clientPromise: Promise<MongoClient>;
+let client = new MongoClient(uri, options);
 
-declare global {
-  // allow global `var` usage in Node
-  var _mongoClientPromise: Promise<MongoClient> | undefined;
-}
-
-if (!global._mongoClientPromise) {
-  client = new MongoClient(uri, options);
-  global._mongoClientPromise = client.connect();
-}
-
-clientPromise = global._mongoClientPromise;
+const clientPromise =
+  global._mongoClientPromise ?? (global._mongoClientPromise = client.connect());
 
 export default clientPromise;
