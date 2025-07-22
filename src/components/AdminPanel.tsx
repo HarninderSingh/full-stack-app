@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react";
 export default function AdminPanel() {
     const { data: session } = useSession();
 
-    if (!session || typeof session.user?.role !== 'string' || session.user.role !== "admin") {
+    if (!session) {
         return <p>Access Denied</p>;
     }
 

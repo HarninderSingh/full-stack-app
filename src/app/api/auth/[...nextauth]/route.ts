@@ -32,12 +32,11 @@ const handler = NextAuth({
           );
           if (!isPasswordValid) return null;
 
-          // ✅ Include role in the returned user object
+          // Only return id, email, name
           return {
             id: user._id.toString(),
             email: user.email,
             name: user.name || user.email,
-            role: user.role || "user", // Default to 'user' if role is missing
           };
         } catch (error) {
           console.error("Auth error:", error);
@@ -70,15 +69,11 @@ const handler = NextAuth({
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        token.role = typeof user.role === 'string' ? user.role : "user"; // Add role to token
       }
       return token;
     },
 
     async session({ session, token }) {
-      if (token?.role && session.user) {
-        session.user.role = token.role;
-      }
       return session;
     },
   },
