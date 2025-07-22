@@ -7,7 +7,7 @@ interface AuditEntry {
     targetUserId: string;
     action: string;
     timestamp: string;
-    details: Record<string, any>;
+    details: Record<string, unknown>;
 }
 
 export default function AuditLogPage() {
@@ -47,7 +47,7 @@ export default function AuditLogPage() {
                             <td className="px-2 py-1">{entry.targetUserId}</td>
                             <td className="px-2 py-1">
                                 <pre className="whitespace-pre-wrap text-xs text-gray-600">
-                                    {JSON.stringify(entry.details, null, 2)}
+                                    {typeof entry.details === 'object' ? JSON.stringify(entry.details, null, 2) : String(entry.details)}
                                 </pre>
                             </td>
                         </tr>

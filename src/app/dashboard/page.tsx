@@ -18,7 +18,7 @@ export default function DashboardPage() {
     const [savingId, setSavingId] = useState<string | null>(null);
 
     useEffect(() => {
-        if (session?.user?.role?.toLowerCase() === "admin") {
+        if ((session?.user as { role?: string } | undefined)?.role?.toLowerCase() === "admin") {
             fetch("/api/admin/users")
                 .then((res) => {
                     if (!res.ok) throw new Error("Unauthorized");
@@ -54,7 +54,7 @@ export default function DashboardPage() {
     if (status === "loading") {
         return <p className="p-6">Loading your dashboard...</p>;
     }
-    if (!session || session.user?.role?.toLowerCase() !== "admin") {
+    if (!session || (session.user as { role?: string } | undefined)?.role?.toLowerCase() !== "admin") {
         return <main className="flex justify-center items-center min-h-[70vh]">
             <div className="card-modern w-full max-w-2xl text-center">
                 <h1 className="text-2xl font-bold text-red-600 mb-4">Access Denied</h1>

@@ -13,7 +13,7 @@ if (!process.env.MONGODB_URI) {
 const uri: string = process.env.MONGODB_URI;
 const options = {};
 
-let client = new MongoClient(uri, options);
+const client = new MongoClient(uri, options);
 
 const clientPromise =
   global._mongoClientPromise ?? (global._mongoClientPromise = client.connect());

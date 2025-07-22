@@ -70,14 +70,14 @@ const handler = NextAuth({
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        token.role = (user as any).role || "user"; // 🔐 Add role to token
+        token.role = typeof user.role === 'string' ? user.role : "user"; // Add role to token
       }
       return token;
     },
 
     async session({ session, token }) {
-      if (token?.role) {
-        (session.user as any).role = token.role; // 🔐 Add role to session
+      if (token?.role && session.user) {
+        session.user.role = token.role;
       }
       return session;
     },
